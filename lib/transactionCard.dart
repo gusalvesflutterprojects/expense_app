@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TransactionCard extends StatelessWidget {
   final String title;
@@ -27,17 +28,41 @@ class TransactionCard extends StatelessWidget {
                 vertical: 10,
               ),
               padding: EdgeInsets.all(10),
-              child: Text(
-                '\$$amount',
-                style: TextStyle(
-                    fontFamily: 'ubuntu', color: Colors.deepPurple, fontSize: 18),
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    '\$${RegExp(r"(\d+)(?=\.)").stringMatch(amount.toString())}',
+                    style: TextStyle(
+                        fontFamily: 'ubuntu',
+                        color: Colors.deepPurple,
+                        fontSize: 18),
+                  ),
+                  Text(
+                    '${RegExp(r"\.(\d+)").stringMatch(amount.toString())}',
+                    style: TextStyle(color: Colors.deepPurple[400]),
+                  )
+                ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(title),
-                Text('${date.day}/${date.month}'),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  DateFormat('dd MMM yyyy').format(date),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                    color: Colors.black45
+                  ),
+                  textAlign: TextAlign.right,
+                ),
               ],
             ),
           ],

@@ -1,3 +1,4 @@
+import 'package:expense_app/addTransactionForm.dart';
 import 'package:flutter/material.dart';
 
 import './transaction.dart';
@@ -37,6 +38,10 @@ class MyHomePage extends StatelessWidget {
     ),
   ];
 
+  void addTransaction(Transaction tx) {
+    transactions.add(tx);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +49,6 @@ class MyHomePage extends StatelessWidget {
         title: Text('Flutter App'),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Container(
@@ -54,12 +58,18 @@ class MyHomePage extends StatelessWidget {
               child: Text('This is the chart'),
             ),
           ),
+          Card(
+            child: Container(
+              padding: EdgeInsets.all(12),
+              child: 
+                  AddTransactionForm(addTransaction),
+            ),
+          ),
           Column(
             children: <Widget>[
-              ...transactions
-                  .map(
-                    (tx) => TransactionCard(tx.title, tx.amount, tx.date),
-                  ),
+              ...transactions.map(
+                (tx) => TransactionCard(tx.title, tx.amount, tx.date),
+              ),
             ],
           ),
         ],
