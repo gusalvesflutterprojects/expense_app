@@ -1,8 +1,10 @@
-import 'package:expense_app/addTransactionForm.dart';
+import 'package:expense_app/widgets/add_transaction_form.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
 
-import './transaction.dart';
-import 'transactionCard.dart';
+import './models/transaction.dart';
+import './widgets/chart.dart';
+import './widgets/transaction_list.dart';
 
 void main() => runApp(MyApp());
 
@@ -16,8 +18,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  final List<Transaction> transactions = [
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final List<Transaction> _transactions = [
     Transaction(
       id: 't1',
       title: 'New shoes',
@@ -38,8 +45,31 @@ class MyHomePage extends StatelessWidget {
     ),
   ];
 
-  void addTransaction(Transaction tx) {
-    transactions.add(tx);
+  void _startAddNewTransaction(BuildContext ctx) {
+    showModalBottomSheet(
+      context: ctx,
+      builder: (_) {
+        return GestureDetector(
+          onTap: () {},
+          behavior: HitTestBehavior.opaque,
+          child: AddTransactionForm(
+            _addTransaction,
+          ),
+        );
+      },
+    );
+  }
+
+  void _addTransaction(String txTitle, double txAmount) {
+    if (txTitle.isNotEmpty && txAmount > 0) {
+      final newTx = Transaction(
+        id: Random().nextInt(999999999).toString(),
+        title: txTitle,
+        amount: txAmount,
+        date: DateTime.now(),
+      );
+      setState(() => _transactions.add(newTx));
+    }
   }
 
   @override
@@ -47,33 +77,31 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Flutter App'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.add,
+            ),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Container(
-            width: double.infinity,
-            child: Card(
-              color: Colors.red,
-              child: Text('This is the chart'),
-            ),
-          ),
-          Card(
-            child: Container(
-              padding: EdgeInsets.all(12),
-              child: 
-                  AddTransactionForm(addTransaction),
-            ),
-          ),
-          Column(
-            children: <Widget>[
-              ...transactions.map(
-                (tx) => TransactionCard(tx.title, tx.amount, tx.date),
-              ),
-            ],
+          Chart(),
+          TransactionList(
+            _transactions,
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        backgroundColor: Colors.orange[700],
+        elevation: 1,
+        onPressed: () => _startAddNewTransaction(context),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
