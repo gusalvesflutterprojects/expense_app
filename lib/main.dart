@@ -12,7 +12,21 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter App',
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+        accentColor: Colors.amber,
+        fontFamily: 'Nunito',
+        appBarTheme: AppBarTheme(
+          textTheme: ThemeData.light().textTheme.copyWith(
+                title: TextStyle(
+                  fontFamily: 'OpenSans',
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+              ),
+        ),
+      ),
+      title: 'Expenses App',
       home: MyHomePage(),
     );
   }
@@ -25,24 +39,24 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [
-    Transaction(
-      id: 't1',
-      title: 'New shoes',
-      amount: 69.99,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't2',
-      title: 'New pajamas',
-      amount: 80.99,
-      date: DateTime.now(),
-    ),
-    Transaction(
-      id: 't3',
-      title: 'New waifu pillow',
-      amount: 40.99,
-      date: DateTime.now(),
-    ),
+    // Transaction(
+    //   id: 't1',
+    //   title: 'New shoes',
+    //   amount: 69.99,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't2',
+    //   title: 'New pajamas',
+    //   amount: 80.99,
+    //   date: DateTime.now(),
+    // ),
+    // Transaction(
+    //   id: 't3',
+    //   title: 'New waifu pillow',
+    //   amount: 40.99,
+    //   date: DateTime.now(),
+    // ),
   ];
 
   void _startAddNewTransaction(BuildContext ctx) {
@@ -69,6 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
         date: DateTime.now(),
       );
       setState(() => _transactions.add(newTx));
+
+      Navigator.of(context).pop();
     }
   }
 
@@ -76,7 +92,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter App'),
+        title: Text(
+          'Expenses App',
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(
@@ -97,7 +115,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
-        backgroundColor: Colors.orange[700],
         elevation: 1,
         onPressed: () => _startAddNewTransaction(context),
       ),
