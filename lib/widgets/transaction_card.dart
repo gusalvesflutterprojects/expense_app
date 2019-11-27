@@ -9,59 +9,28 @@ class TransactionCard extends StatelessWidget {
   TransactionCard(this.title, this.amount, this.date);
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      child: Card(
-        child: Row(
-          children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColorLight,
-                borderRadius: BorderRadius.all(Radius.zero),
-                border: Border.all(
-                  color: Theme.of(context).primaryColorDark,
-                  width: 2.0,
-                ),
-              ),
-              margin: EdgeInsets.symmetric(
-                horizontal: 15,
-                vertical: 10,
-              ),
-              padding: EdgeInsets.all(10),
-              child: Row(
-                children: <Widget>[
-                  Text(
-                    '\$${RegExp(r"(\d+)(?=\.)").stringMatch(amount.toStringAsFixed(2))}',
-                    style: TextStyle(
-                        color: Theme.of(context).primaryColorDark,
-                        fontSize: 18),
-                  ),
-                  Text(
-                    '${RegExp(r"\.(\d+)").stringMatch(amount.toStringAsFixed(2))}',
-                    style: TextStyle(color: Theme.of(context).primaryColor),
-                  )
-                ],
-              ),
+    return Card(
+      margin: EdgeInsets.symmetric(
+        vertical: 8,
+        horizontal: 5,
+      ),
+      elevation: 4,
+      child: ListTile(
+        leading: CircleAvatar(
+          radius: 30,
+          child: Padding(
+            padding: const EdgeInsets.all(6),
+            child: FittedBox(
+              child: Text('\$$amount'),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.title
-                ),
-                Text(
-                  DateFormat('dd MMM yyyy').format(date),
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: Colors.black45
-                  ),
-                  textAlign: TextAlign.right,
-                ),
-              ],
-            ),
-          ],
+          ),
+        ),
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.title,
+        ),
+        subtitle: Text(
+          DateFormat('dd-MMM-yyyy').format(date),
         ),
       ),
     );

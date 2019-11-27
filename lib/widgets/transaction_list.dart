@@ -14,24 +14,26 @@ class TransactionList extends StatelessWidget {
       height: 400,
       child: transactions.length > 0
           ? ListView.builder(
+              itemCount: transactions.length,
               itemBuilder: (
                 ctx,
                 index,
               ) {
-                final tx = transactions[index];
                 return TransactionCard(
-                  tx.title,
-                  tx.amount,
-                  tx.date,
+                  transactions[index].title,
+                  transactions[index].amount,
+                  transactions[index].date,
                 );
               },
-              itemCount: transactions.length,
             )
           : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text(
                   'No transactions added yet!',
+                ),
+                SizedBox(
+                  height: 10,
                 ),
                 Container(
                   height: 350,

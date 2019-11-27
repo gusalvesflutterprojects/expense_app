@@ -21,6 +21,7 @@ dependencies:
     sdk: flutter
   intl: ^0.16.0
   flutter_masked_text: ^0.8.0
+  flutter_datetime_picker: ^1.2.8
   # conditional_builder: ^1.0.2
 
 dev_dependencies:
@@ -32,20 +33,13 @@ flutter:
     - assets/images/waiting.png
 
   fonts:
-    - family: Roboto
+    - family: Ultra
       fonts:
-        - asset: assets/fonts/Roboto-Regular.ttf
-          weight: 700   
-
-    - family: Nunito
+        - asset: assets/fonts/Ultra-Regular.ttf
+    - family: SanFrancisco
       fonts:
-        - asset: assets/fonts/Nunito-Regular.ttf
-        - asset: assets/fonts/Nunito-Bold.ttf
-          weight: 700 
-    - family: OpenSans
-      fonts:
-        - asset: assets/fonts/OpenSans-Regular.ttf
-        - asset: assets/fonts/OpenSans-Bold.ttf
-          weight: 700 
+        - asset: assets/fonts/San-Francisco-Regular.ttf
+        - asset: assets/fonts/San-Francisco-Bold.ttf
+          weight: 700
 
   uses-material-design: true

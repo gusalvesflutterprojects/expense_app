@@ -13,18 +13,35 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.purple,
-        accentColor: Colors.amber,
-        fontFamily: 'Nunito',
         appBarTheme: AppBarTheme(
           textTheme: ThemeData.light().textTheme.copyWith(
                 title: TextStyle(
-                  fontFamily: 'OpenSans',
+                  fontFamily: 'SanFrancisco',
                   fontSize: 20,
                   color: Colors.white,
                 ),
               ),
         ),
+        textTheme: ThemeData.light().textTheme.copyWith(
+              title: TextStyle(
+                fontFamily: 'SanFrancisco',
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+              button: TextStyle(
+                color: Colors.white,
+              ),
+              body1: TextStyle(
+                fontFamily: 'SanFrancisco',
+              ),
+            ),
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: TextStyle(
+            fontFamily: 'SanFrancisco',
+          ),
+        ),
+        primarySwatch: Colors.purple,
+        accentColor: Colors.amber,
       ),
       title: 'Expenses App',
       home: MyHomePage(),
@@ -39,25 +56,32 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _transactions = [
-    // Transaction(
-    //   id: 't1',
-    //   title: 'New shoes',
-    //   amount: 69.99,
-    //   date: DateTime.now(),
-    // ),
-    // Transaction(
-    //   id: 't2',
-    //   title: 'New pajamas',
-    //   amount: 80.99,
-    //   date: DateTime.now(),
-    // ),
-    // Transaction(
-    //   id: 't3',
-    //   title: 'New waifu pillow',
-    //   amount: 40.99,
-    //   date: DateTime.now(),
-    // ),
+    Transaction(
+      id: 't1',
+      title: 'New shoes',
+      amount: 69.99,
+      date: DateTime.now(),
+    ),
+    Transaction(
+      id: 't2',
+      title: 'New pajamas',
+      amount: 80.99,
+      date: DateTime.now().subtract(Duration(days: 6)),
+    ),
+    Transaction(
+      id: 't3',
+      title: 'New waifu pillow',
+      amount: 40.99,
+      date: DateTime.now().subtract(Duration(days: 3)),
+    ),
   ];
+
+  List<Transaction> get _recentTransactions {
+    return _transactions
+        .where(
+            (tx) => tx.date.isAfter(DateTime.now().subtract(Duration(days: 7))))
+        .toList();
+  }
 
   void _startAddNewTransaction(BuildContext ctx) {
     showModalBottomSheet(
@@ -74,13 +98,13 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _addTransaction(String txTitle, double txAmount) {
+  void _addTransaction(String txTitle, double txAmount, DateTime txDate) {
     if (txTitle.isNotEmpty && txAmount > 0) {
       final newTx = Transaction(
         id: Random().nextInt(999999999).toString(),
         title: txTitle,
         amount: txAmount,
-        date: DateTime.now(),
+        date: txDate,
       );
       setState(() => _transactions.add(newTx));
 
@@ -107,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Chart(),
+          Chart(_recentTransactions),
           TransactionList(
             _transactions,
           ),
