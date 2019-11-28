@@ -165,7 +165,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Transaction> get _olderTransactions {
-    return _transactions.where((tx) => tx.date.isBefore(_firstDay.subtract(Duration(days: 1)))).toList();
+    return _transactions
+        .where((tx) => tx.date.isBefore(_firstDay.subtract(Duration(days: 1))))
+        .toList();
   }
 
   List<Transaction> get _weekTransactions {
@@ -212,6 +214,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    
+    print('=========_weekTransactions.length: ${_weekTransactions.length}');
+    
+    print('=========_olderTransactions.length: ${_olderTransactions.length}');
+    
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -234,36 +242,73 @@ class _MyHomePageState extends State<MyHomePage> {
             _firstDay,
             _limitValue,
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              'Week spendings',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.orange[700],
-              ),
-            ),
+          Expanded(
+            child: _weekTransactions.length > 0 || _olderTransactions.length > 0
+                ? ListView(
+                    children: <Widget>[
+                      _weekTransactions.length > 0
+                          ? Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Text(
+                                    'Week spendings',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange[700],
+                                    ),
+                                  ),
+                                ),
+                                TransactionList(
+                                  _weekTransactions,
+                                  _removeTransaction,
+                                ),
+                              ],
+                            )
+                          : Container(),
+                      _olderTransactions.length > 0
+                          ? Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Text(
+                                    'Older spendings',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange[700],
+                                    ),
+                                  ),
+                                ),
+                                TransactionList(
+                                  _olderTransactions,
+                                  _removeTransaction,
+                                ),
+                              ],
+                            )
+                          : Container(),
+                    ],
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'No transactions added yet!',
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        height: 350,
+                        child: Image.asset(
+                          'assets/images/waiting.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ],
+                  ),
           ),
-          TransactionList(
-            _weekTransactions,
-            _removeTransaction,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              'Older spendings',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.orange[700],
-              ),
-            ),
-          ),
-          TransactionList(
-            _olderTransactions,
-            _removeTransaction,
-          )
         ],
       ),
       floatingActionButton: FloatingActionButton(
