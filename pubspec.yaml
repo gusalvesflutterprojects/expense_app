@@ -22,7 +22,7 @@ dependencies:
   intl: ^0.16.0
   flutter_masked_text: ^0.8.0
   flutter_datetime_picker: ^1.2.8
-  # conditional_builder: ^1.0.2
+  uuid: ^2.0.4
 
 dev_dependencies:
   flutter_test:

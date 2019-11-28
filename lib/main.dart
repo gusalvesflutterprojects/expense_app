@@ -1,12 +1,14 @@
-import 'package:expense_app/widgets/add_transaction_form.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
+import 'package:uuid/uuid.dart';
 
 import './models/transaction.dart';
 import './widgets/chart.dart';
 import './widgets/transaction_list.dart';
+import './widgets/add_transaction_form.dart';
 
 void main() => runApp(MyApp());
+
+var uuid = Uuid();
 
 class MyApp extends StatelessWidget {
   @override
@@ -41,7 +43,8 @@ class MyApp extends StatelessWidget {
           ),
         ),
         primarySwatch: Colors.purple,
-        accentColor: Colors.amber,
+        accentColor: Colors.greenAccent,
+        errorColor: Colors.red[700],
       ),
       title: 'Expenses App',
       home: MyHomePage(),
@@ -55,31 +58,121 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  double _limitValue = 1000;
+
   final List<Transaction> _transactions = [
     Transaction(
-      id: 't1',
+      id: uuid.v1(),
       title: 'New shoes',
       amount: 69.99,
       date: DateTime.now(),
     ),
     Transaction(
-      id: 't2',
+      id: uuid.v1(),
       title: 'New pajamas',
       amount: 80.99,
-      date: DateTime.now().subtract(Duration(days: 6)),
+      date: DateTime.now().subtract(Duration(days: 1)),
     ),
     Transaction(
-      id: 't3',
+      id: uuid.v1(),
+      title: 'New pajamas',
+      amount: 80.99,
+      date: DateTime.now().subtract(Duration(days: 1)),
+    ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'New pajamas',
+      amount: 80.99,
+      date: DateTime.now().subtract(Duration(days: 1)),
+    ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'New pajamas',
+      amount: 80.99,
+      date: DateTime.now().subtract(Duration(days: 1)),
+    ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'New pajamas',
+      amount: 80.99,
+      date: DateTime.now().subtract(Duration(days: 1)),
+    ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'New pajamas',
+      amount: 80.99,
+      date: DateTime.now().subtract(Duration(days: 1)),
+    ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'New pajamas',
+      amount: 80.99,
+      date: DateTime.now().subtract(Duration(days: 1)),
+    ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'New pajamas',
+      amount: 80.99,
+      date: DateTime.now().subtract(Duration(days: 1)),
+    ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'New pajamas',
+      amount: 80.99,
+      date: DateTime.now().subtract(Duration(days: 1)),
+    ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'New waifu pillow',
+      amount: 40.99,
+      date: DateTime.now().subtract(Duration(days: 2)),
+    ),
+    Transaction(
+      id: uuid.v1(),
       title: 'New waifu pillow',
       amount: 40.99,
       date: DateTime.now().subtract(Duration(days: 3)),
     ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'New waifu pillow',
+      amount: 40.99,
+      date: DateTime.now().subtract(Duration(days: 4)),
+    ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'New waifu pillow',
+      amount: 40.99,
+      date: DateTime.now().subtract(Duration(days: 5)),
+    ),
+    Transaction(
+      id: uuid.v1(),
+      title: 'Before date',
+      amount: 40.99,
+      date: DateTime.now().subtract(Duration(days: 10)),
+    ),
   ];
 
-  List<Transaction> get _recentTransactions {
+  DateTime get _firstDay {
+    int sundayWeekdayNum = 7;
+    DateTime lastSunday = DateTime.now();
+
+    while (lastSunday.weekday != sundayWeekdayNum) {
+      lastSunday = lastSunday.subtract(Duration(days: 1));
+    }
+
+    return lastSunday;
+  }
+
+  List<Transaction> get _olderTransactions {
+    return _transactions.where((tx) => tx.date.isBefore(_firstDay.subtract(Duration(days: 1)))).toList();
+  }
+
+  List<Transaction> get _weekTransactions {
     return _transactions
-        .where(
-            (tx) => tx.date.isAfter(DateTime.now().subtract(Duration(days: 7))))
+        .where((tx) =>
+            tx.date.isAfter(_firstDay.subtract(Duration(days: 1))) &&
+            tx.date.isBefore(DateTime.now()))
         .toList();
   }
 
@@ -92,6 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
           behavior: HitTestBehavior.opaque,
           child: AddTransactionForm(
             _addTransaction,
+            _firstDay,
           ),
         );
       },
@@ -101,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _addTransaction(String txTitle, double txAmount, DateTime txDate) {
     if (txTitle.isNotEmpty && txAmount > 0) {
       final newTx = Transaction(
-        id: Random().nextInt(999999999).toString(),
+        id: uuid.v1(),
         title: txTitle,
         amount: txAmount,
         date: txDate,
@@ -110,6 +204,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
       Navigator.of(context).pop();
     }
+  }
+
+  void _removeTransaction(String txId) {
+    setState(() => _transactions.removeWhere((tx) => tx.id == txId));
   }
 
   @override
@@ -131,10 +229,41 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Chart(_recentTransactions),
-          TransactionList(
-            _transactions,
+          Chart(
+            _weekTransactions,
+            _firstDay,
+            _limitValue,
           ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text(
+              'Week spendings',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange[700],
+              ),
+            ),
+          ),
+          TransactionList(
+            _weekTransactions,
+            _removeTransaction,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text(
+              'Older spendings',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange[700],
+              ),
+            ),
+          ),
+          TransactionList(
+            _olderTransactions,
+            _removeTransaction,
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(

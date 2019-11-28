@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 import '../models/transaction.dart';
 import '../widgets/transaction_card.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
+  final Function removeTransaction;
 
-  TransactionList(this.transactions);
+  TransactionList(
+    this.transactions,
+    this.removeTransaction,
+  );
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 400,
+    return Expanded(
       child: transactions.length > 0
           ? ListView.builder(
               itemCount: transactions.length,
@@ -20,9 +22,11 @@ class TransactionList extends StatelessWidget {
                 index,
               ) {
                 return TransactionCard(
+                  transactions[index].id,
                   transactions[index].title,
                   transactions[index].amount,
                   transactions[index].date,
+                  removeTransaction,
                 );
               },
             )
@@ -45,5 +49,12 @@ class TransactionList extends StatelessWidget {
               ],
             ),
     );
+  }
+}
+
+class Teste extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(child: Text('teste'));
   }
 }

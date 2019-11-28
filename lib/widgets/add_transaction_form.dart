@@ -6,8 +6,9 @@ import 'package:intl/intl.dart';
 
 class AddTransactionForm extends StatefulWidget {
   final Function addTransaction;
+  final DateTime firstDay;
 
-  AddTransactionForm(this.addTransaction);
+  AddTransactionForm(this.addTransaction, this.firstDay);
 
   @override
   _AddTransactionFormState createState() => _AddTransactionFormState();
@@ -15,12 +16,10 @@ class AddTransactionForm extends StatefulWidget {
 
 class _AddTransactionFormState extends State<AddTransactionForm> {
   final titleController = TextEditingController();
-
   final amountController = MoneyMaskedTextController(
     decimalSeparator: '.',
     thousandSeparator: ',',
   );
-
   DateTime _selectedDate = DateTime.now();
 
   @override
@@ -51,17 +50,16 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
             Row(
               children: <Widget>[
                 Text('Pick a date'),
-                SizedBox(width: 12,),
+                SizedBox(
+                  width: 12,
+                ),
                 FlatButton(
                   onPressed: () {
                     DatePicker.showDatePicker(
                       context,
                       showTitleActions: true,
-                      minTime: DateTime.now().subtract(
-                        Duration(days: 30),
-                      ),
+                      minTime: widget.firstDay,
                       maxTime: DateTime.now(),
-                      onChanged: (date) => setState(() => _selectedDate = date),
                       onConfirm: (date) {
                         setState(() => _selectedDate = date);
                       },

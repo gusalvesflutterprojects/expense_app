@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TransactionCard extends StatelessWidget {
+  final String id;
   final String title;
   final double amount;
   final DateTime date;
+  final Function _removeTransaction;
 
-  TransactionCard(this.title, this.amount, this.date);
+  TransactionCard(
+      this.id, this.title, this.amount, this.date, this._removeTransaction);
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -31,6 +34,13 @@ class TransactionCard extends StatelessWidget {
         ),
         subtitle: Text(
           DateFormat('dd-MMM-yyyy').format(date),
+        ),
+        trailing: IconButton(
+          icon: Icon(
+            Icons.delete,
+            color: Theme.of(context).errorColor,
+          ),
+          onPressed: () => _removeTransaction(id),
         ),
       ),
     );
