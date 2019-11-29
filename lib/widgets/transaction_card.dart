@@ -14,33 +14,34 @@ class TransactionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(
-        vertical: 8,
-        horizontal: 5,
+        vertical: 4,
+        horizontal: 4,
       ),
-      elevation: 4,
-      child: ListTile(
-        leading: CircleAvatar(
-          radius: 30,
-          child: Padding(
-            padding: const EdgeInsets.all(6),
-            child: FittedBox(
-              child: Text('\$$amount'),
+      child: Container(
+        child: ListTile(
+          leading: CircleAvatar(
+            radius: 30,
+            child: Padding(
+              padding: const EdgeInsets.all(6),
+              child: FittedBox(
+                child: Text('\$$amount'),
+              ),
             ),
           ),
-        ),
-        title: Text(
-          title,
-          style: Theme.of(context).textTheme.title,
-        ),
-        subtitle: Text(
-          DateFormat('dd-MMM-yyyy').format(date),
-        ),
-        trailing: IconButton(
-          icon: Icon(
-            Icons.delete,
-            color: Theme.of(context).errorColor,
+          title: Text(
+            title,
+            style: Theme.of(context).textTheme.title,
           ),
-          onPressed: () => _removeTransaction(id),
+          subtitle: Text(
+            DateFormat('dd-MMM-yyyy').format(date),
+          ),
+          trailing: IconButton(
+            icon: Icon(
+              Icons.delete,
+              color: Theme.of(context).errorColor,
+            ),
+            onPressed: () => _removeTransaction(id),
+          ),
         ),
       ),
     );

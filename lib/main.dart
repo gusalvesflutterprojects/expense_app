@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
         textTheme: ThemeData.light().textTheme.copyWith(
               title: TextStyle(
                 fontFamily: 'Helvetica',
-                fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
               button: TextStyle(

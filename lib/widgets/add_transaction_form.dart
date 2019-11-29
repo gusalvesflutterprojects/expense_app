@@ -20,8 +20,9 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
     decimalSeparator: '.',
     thousandSeparator: ',',
   );
-  DateTime _selectedDate = DateTime.now();
   final _focusAmount = FocusNode();
+
+  DateTime _selectedDate = DateTime.now();
 
   void _showDatePicker() {
     DatePicker.showDatePicker(

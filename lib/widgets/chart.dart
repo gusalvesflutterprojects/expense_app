@@ -44,38 +44,69 @@ class Chart extends StatelessWidget {
         0.0, (sum, item) => sum + item['amount']);
   }
 
+  get _limitColor {
+    if (_totalSpending == 0)
+      return Color.fromRGBO(220, 220, 220, 1);
+    else if (_totalSpending <= limitValue / 100 * 50)
+      return Colors.lightGreenAccent;
+    else if (_totalSpending <= limitValue / 100 * 80)
+      return Colors.yellowAccent;
+    else
+      return Colors.redAccent;
+  }
+
   @override
   Widget build(BuildContext context) {
+    
+    print('=========_limitColor: ${_limitColor}');
+    
     return Card(
       elevation: 4,
       margin: EdgeInsets.all(20),
-      child: Column(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                ...groupedTransactionValues
-                    .map(
-                      (data) => ChartBar(
-                        data['day'],
-                        data['amount'],
-                        (data['amount'] as double) / _totalSpending,
-                      ),
-                    )
-                    .toList()
-              ],
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            // Where the linear gradient begins and ends
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            // Add one stop for each color. Stops should increase from 0 to 1
+            stops: [.3, .6],
+            colors: [
+              // Colors are easy thanks to Flutter's Colors class.
+              _limitColor,
+              Colors.white,
+            ],
+          ),
+        ),
+        child: Column(
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  ...groupedTransactionValues
+                      .map(
+                        (data) => ChartBar(
+                          data['day'],
+                          data['amount'],
+                          (data['amount'] as double) / _totalSpending,
+                        ),
+                      )
+                      .toList()
+                ],
+              ),
             ),
-          ),
-          SizedBox(
-            height: 16,
-          ),
-          LimitBar(
-            _totalSpending,
-            limitValue,
-          ),
-        ],
+            SizedBox(
+              height: 16,
+            ),
+            LimitBar(
+              _totalSpending,
+              limitValue,
+              _limitColor,
+            ),
+          ],
+        ),
       ),
     );
   }
