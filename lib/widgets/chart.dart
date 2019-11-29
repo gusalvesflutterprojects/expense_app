@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../models/transaction.dart';
 import './chart_bar.dart';
+import './limit_bar.dart';
 
 class Chart extends StatelessWidget {
   final List<Transaction> weekTransactions;
@@ -38,18 +39,9 @@ class Chart extends StatelessWidget {
     ).toList();
   }
 
-  double get totalSpending {
+  double get _totalSpending {
     return groupedTransactionValues.fold(
         0.0, (sum, item) => sum + item['amount']);
-  }
-
-  get _limitColor {
-    if (totalSpending <= limitValue / 100 * 50)
-      return Colors.lightGreenAccent;
-    else if (totalSpending <= limitValue / 100 * 80)
-      return Colors.yellowAccent;
-    else
-      return Colors.redAccent;
   }
 
   @override
@@ -69,7 +61,7 @@ class Chart extends StatelessWidget {
                       (data) => ChartBar(
                         data['day'],
                         data['amount'],
-                        (data['amount'] as double) / totalSpending,
+                        (data['amount'] as double) / _totalSpending,
                       ),
                     )
                     .toList()
@@ -79,57 +71,9 @@ class Chart extends StatelessWidget {
           SizedBox(
             height: 16,
           ),
-          Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Text('Amount spent',
-                          style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.bold)),
-                      Text('\$${totalSpending.toStringAsFixed(2)}'),
-                    ],
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Text(
-                        'Week limit',
-                        style: TextStyle(
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Text('\$${limitValue.toStringAsFixed(2)}'),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Container(
-                height: 18,
-                child: Stack(
-                  children: <Widget>[
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(220, 220, 220, 1),
-                      ),
-                    ),
-                    FractionallySizedBox(
-                      widthFactor: totalSpending / limitValue,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: _limitColor,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          LimitBar(
+            _totalSpending,
+            limitValue,
           ),
         ],
       ),

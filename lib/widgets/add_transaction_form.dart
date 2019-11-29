@@ -21,6 +21,21 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
     thousandSeparator: ',',
   );
   DateTime _selectedDate = DateTime.now();
+  final _focusAmount = FocusNode();
+
+  void _showDatePicker() {
+    DatePicker.showDatePicker(
+      context,
+      showTitleActions: true,
+      minTime: widget.firstDay,
+      maxTime: DateTime.now(),
+      onConfirm: (date) {
+        setState(() => _selectedDate = date);
+      },
+      currentTime: _selectedDate,
+      locale: LocaleType.pt,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,19 +45,20 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            TextField(
+            TextFormField(
               controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Title',
-              ),
+              textInputAction: TextInputAction.next,
+              autofocus: true,
+              decoration: InputDecoration(labelText: "Title"),
+              onFieldSubmitted: (_) =>
+                  FocusScope.of(context).requestFocus(_focusAmount),
             ),
-            TextField(
+            TextFormField(
               controller: amountController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Amount',
-              ),
-              onSubmitted: (_) => widget.addTransaction,
+              focusNode: _focusAmount,
+              decoration: InputDecoration(labelText: "Amount"),
+              onFieldSubmitted: (_) => _showDatePicker(),
             ),
             SizedBox(
               height: 24,
@@ -55,17 +71,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
                 ),
                 FlatButton(
                   onPressed: () {
-                    DatePicker.showDatePicker(
-                      context,
-                      showTitleActions: true,
-                      minTime: widget.firstDay,
-                      maxTime: DateTime.now(),
-                      onConfirm: (date) {
-                        setState(() => _selectedDate = date);
-                      },
-                      currentTime: _selectedDate,
-                      locale: LocaleType.pt,
-                    );
+                    _showDatePicker();
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -98,13 +104,9 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
               child: FlatButton(
                 child: Text(
                   'Add transaction',
-                  style: TextStyle(shadows: <Shadow>[
-                    // Shadow(
-                    //   offset: Offset(2.0, 3.0),
-                    //   blurRadius: 3.0,
-                    //   color: Color.fromARGB(255, 0, 0, 0),
-                    // ),
-                  ], color: Theme.of(context).textTheme.button.color),
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.button.color,
+                  ),
                 ),
                 textColor: Colors.white,
                 color: Theme.of(context).primaryColor,

@@ -35,7 +35,7 @@ class ChartBar extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).primaryColor,
                       width: 1.0,
                     ),
                     color: Color.fromRGBO(220, 220, 220, 1),
@@ -47,8 +47,7 @@ class ChartBar extends StatelessWidget {
                       spendingPctOfTotal.isNaN ? 0 : spendingPctOfTotal,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Theme.of(context).accentColor,
-                      backgroundBlendMode: BlendMode.hardLight,
+                      color: Theme.of(context).primaryColor,
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),

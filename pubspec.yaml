@@ -33,9 +33,9 @@ flutter:
     - assets/images/waiting.png
 
   fonts:
-    - family: Ultra
+    - family: Helvetica
       fonts:
-        - asset: assets/fonts/Ultra-Regular.ttf
+        - asset: assets/fonts/Helvetica-Regular.ttf
     - family: SanFrancisco
       fonts:
         - asset: assets/fonts/San-Francisco-Regular.ttf

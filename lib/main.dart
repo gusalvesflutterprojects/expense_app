@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
-import './models/transaction.dart';
 import './widgets/chart.dart';
-import './widgets/transaction_list.dart';
+import './models/transaction.dart';
+import './widgets/empty_transactions.dart';
 import './widgets/add_transaction_form.dart';
+import './widgets/transaction_list_container.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
         appBarTheme: AppBarTheme(
           textTheme: ThemeData.light().textTheme.copyWith(
                 title: TextStyle(
-                  fontFamily: 'SanFrancisco',
+                  fontFamily: 'Helvetica',
                   fontSize: 20,
                   color: Colors.white,
                 ),
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
         ),
         textTheme: ThemeData.light().textTheme.copyWith(
               title: TextStyle(
-                fontFamily: 'SanFrancisco',
+                fontFamily: 'Helvetica',
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
@@ -164,17 +165,23 @@ class _MyHomePageState extends State<MyHomePage> {
     return lastSunday;
   }
 
-  List<Transaction> get _olderTransactions {
-    return _transactions
-        .where((tx) => tx.date.isBefore(_firstDay.subtract(Duration(days: 1))))
-        .toList();
-  }
-
   List<Transaction> get _weekTransactions {
     return _transactions
         .where((tx) =>
             tx.date.isAfter(_firstDay.subtract(Duration(days: 1))) &&
             tx.date.isBefore(DateTime.now()))
+        .toList();
+  }
+
+  List<Transaction> get _olderTransactions {
+    return _transactions
+        .where(
+          (tx) => tx.date.isBefore(
+            _firstDay.subtract(
+              Duration(days: 1),
+            ),
+          ),
+        )
         .toList();
   }
 
@@ -194,7 +201,11 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _addTransaction(String txTitle, double txAmount, DateTime txDate) {
+  void _addTransaction(
+    String txTitle,
+    double txAmount,
+    DateTime txDate,
+  ) {
     if (txTitle.isNotEmpty && txAmount > 0) {
       final newTx = Transaction(
         id: uuid.v1(),
@@ -202,24 +213,24 @@ class _MyHomePageState extends State<MyHomePage> {
         amount: txAmount,
         date: txDate,
       );
-      setState(() => _transactions.add(newTx));
+      setState(
+        () => _transactions.add(newTx),
+      );
 
       Navigator.of(context).pop();
     }
   }
 
   void _removeTransaction(String txId) {
-    setState(() => _transactions.removeWhere((tx) => tx.id == txId));
+    setState(
+      () => _transactions.removeWhere(
+        (tx) => tx.id == txId,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    
-    print('=========_weekTransactions.length: ${_weekTransactions.length}');
-    
-    print('=========_olderTransactions.length: ${_olderTransactions.length}');
-    
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -247,67 +258,22 @@ class _MyHomePageState extends State<MyHomePage> {
                 ? ListView(
                     children: <Widget>[
                       _weekTransactions.length > 0
-                          ? Column(
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Text(
-                                    'Week spendings',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.orange[700],
-                                    ),
-                                  ),
-                                ),
-                                TransactionList(
-                                  _weekTransactions,
-                                  _removeTransaction,
-                                ),
-                              ],
+                          ? TransactionListContainer(
+                              _weekTransactions,
+                              _removeTransaction,
+                              'Week spendings',
                             )
-                          : Container(),
+                          : Container(), // ? Render nothing
                       _olderTransactions.length > 0
-                          ? Column(
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Text(
-                                    'Older spendings',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.orange[700],
-                                    ),
-                                  ),
-                                ),
-                                TransactionList(
-                                  _olderTransactions,
-                                  _removeTransaction,
-                                ),
-                              ],
+                          ? TransactionListContainer(
+                              _olderTransactions,
+                              _removeTransaction,
+                              'Older spendings',
                             )
-                          : Container(),
+                          : Container(), // ? Render nothing,
                     ],
                   )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        'No transactions added yet!',
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        height: 350,
-                        child: Image.asset(
-                          'assets/images/waiting.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ],
-                  ),
+                : EmptyTransactions(),
           ),
         ],
       ),
