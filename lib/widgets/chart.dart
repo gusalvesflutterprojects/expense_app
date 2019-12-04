@@ -1,38 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
 import '../models/transaction.dart';
-import './chart_bar.dart';
-import './limit_bar.dart';
+import './chartBar.dart';
+import './limitBar.dart';
 
-class Chart extends StatelessWidget {
-  final List<Transaction> weekTransactions;
+class Chart extends StatefulWidget {
+  final List<Transaction> rangeTransactions;
   final DateTime firstDay;
   final double limitValue;
+  final Function startUpdateLimitValue;
+  final String timeRangeName;
+  final Function changeTimeRangeName;
 
-  Chart(this.weekTransactions, this.firstDay, this.limitValue);
+  Chart(
+    this.rangeTransactions,
+    this.firstDay,
+    this.limitValue,
+    this.startUpdateLimitValue,
+    this.timeRangeName,
+    this.changeTimeRangeName,
+  );
 
+  @override
+  _ChartState createState() => _ChartState();
+}
+
+class _ChartState extends State<Chart> {
   List<Map<String, Object>> get groupedTransactionValues {
-    return List.generate(
-      7,
+    return List.generate(widget.timeRangeName == 'week' ? 7 : 30,
       (index) {
         double totalSum = 0.0;
 
-        final weekDay = firstDay.add(
+        final weekDay = widget.firstDay.add(
           Duration(
             days: index,
           ),
         );
 
-        for (var i = 0; i < weekTransactions.length; i++) {
-          if (weekTransactions[i].date.day == weekDay.day &&
-              weekTransactions[i].date.month == weekDay.month &&
-              weekTransactions[i].date.year == weekDay.year)
-            totalSum += weekTransactions[i].amount;
+        for (var i = 0; i < widget.rangeTransactions.length; i++) {
+          if (widget.rangeTransactions[i].date.day == weekDay.day &&
+              widget.rangeTransactions[i].date.month == weekDay.month &&
+              widget.rangeTransactions[i].date.year == weekDay.year)
+            totalSum += widget.rangeTransactions[i].amount;
         }
 
         return {
-          'day': DateFormat.E().format(weekDay).substring(0, 3),
+          'day': weekDay,
           'amount': totalSum,
         };
       },
@@ -47,9 +59,9 @@ class Chart extends StatelessWidget {
   get _limitColor {
     if (_totalSpending == 0)
       return Color.fromRGBO(220, 220, 220, 1);
-    else if (_totalSpending <= limitValue / 100 * 50)
+    else if (_totalSpending <= widget.limitValue / 100 * 50)
       return Colors.lightGreenAccent;
-    else if (_totalSpending <= limitValue / 100 * 80)
+    else if (_totalSpending <= widget.limitValue / 100 * 80)
       return Colors.yellowAccent;
     else
       return Colors.redAccent;
@@ -57,9 +69,6 @@ class Chart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
-    print('=========_limitColor: ${_limitColor}');
-    
     return Card(
       elevation: 4,
       margin: EdgeInsets.all(20),
@@ -81,9 +90,11 @@ class Chart extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Container(
+              width: MediaQuery.of(context).size.width * 1,
+              height: 144,
               padding: EdgeInsets.all(12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
                 children: <Widget>[
                   ...groupedTransactionValues
                       .map(
@@ -102,8 +113,11 @@ class Chart extends StatelessWidget {
             ),
             LimitBar(
               _totalSpending,
-              limitValue,
+              widget.limitValue,
               _limitColor,
+              widget.startUpdateLimitValue,
+              widget.timeRangeName,
+              widget.changeTimeRangeName,
             ),
           ],
         ),
