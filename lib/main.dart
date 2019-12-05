@@ -362,7 +362,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Chart(
             _rangeTransactions,
             _firstDay,
-            _limitValues[_timeRangeName],
+            _limitValues[_timeRangeName].toDouble(),
             _startUpdateLimitValue,
             _timeRangeName,
             _changeTimeRangeName,
