@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/transaction.dart';
 import './chartBar.dart';
 import './limitBar.dart';
@@ -26,7 +27,8 @@ class Chart extends StatefulWidget {
 
 class _ChartState extends State<Chart> {
   List<Map<String, Object>> get groupedTransactionValues {
-    return List.generate(widget.timeRangeName == 'week' ? 7 : 30,
+    return List.generate(
+      widget.timeRangeName == 'week' ? 7 : 30,
       (index) {
         double totalSum = 0.0;
 
@@ -67,12 +69,27 @@ class _ChartState extends State<Chart> {
       return Colors.redAccent;
   }
 
+  String _formatOrdinalDay(int val) {
+    switch (val) {
+      case 1:
+        return '1st';
+      case 2:
+        return '2nd';
+      case 3:
+        return '3rd';
+        break;
+      default:
+        return '${val}th';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 8,
       margin: EdgeInsets.all(20),
       child: Container(
+        height: MediaQuery.of(context).size.height * 0.35,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             // Where the linear gradient begins and ends
@@ -81,45 +98,60 @@ class _ChartState extends State<Chart> {
             // Add one stop for each color. Stops should increase from 0 to 1
             stops: [.3, .6],
             colors: [
-              // Colors are easy thanks to Flutter's Colors class.
               _limitColor,
               Colors.white,
             ],
           ),
         ),
-        child: Column(
-          children: <Widget>[
-            Container(
-              width: MediaQuery.of(context).size.width * 1,
-              height: 144,
-              padding: EdgeInsets.all(12),
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: <Widget>[
-                  ...groupedTransactionValues
-                      .map(
-                        (data) => ChartBar(
-                          data['day'],
-                          data['amount'],
-                          (data['amount'] as double) / _totalSpending,
-                        ),
-                      )
-                      .toList()
-                ],
+        child: LayoutBuilder(
+          builder: (ctx, cst) => Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                height: cst.maxHeight * 0.1,
+                child: Text(
+                  widget.timeRangeName == 'week'
+                      ? 'Week of ${DateFormat('MMMM').format(widget.firstDay)} ${_formatOrdinalDay(widget.firstDay.day)}'
+                      : '${DateFormat('MMMM').format(DateTime.now())}',
+                  style: TextStyle(fontSize: 18),
+                ),
               ),
-            ),
-            SizedBox(
-              height: 16,
-            ),
-            LimitBar(
-              _totalSpending,
-              widget.limitValue,
-              _limitColor,
-              widget.startUpdateLimitValue,
-              widget.timeRangeName,
-              widget.changeTimeRangeName,
-            ),
-          ],
+              Container(
+                height: cst.maxHeight * 0.55,
+                child: LayoutBuilder(
+                  builder: (ctx, cst) => ListView(
+                    semanticChildCount: 7,
+                    scrollDirection: Axis.horizontal,
+                    children: <Widget>[
+                      ...groupedTransactionValues
+                          .map(
+                            (data) => Container(
+                              width: cst.maxWidth * 0.142857143,
+                              child: ChartBar(
+                                data['day'],
+                                data['amount'],
+                                (data['amount'] as double) / _totalSpending,
+                              ),
+                            ),
+                          )
+                          .toList()
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                height: cst.maxHeight * 0.35,
+                child: LimitBar(
+                  _totalSpending,
+                  widget.limitValue,
+                  _limitColor,
+                  widget.startUpdateLimitValue,
+                  widget.timeRangeName,
+                  widget.changeTimeRangeName,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
