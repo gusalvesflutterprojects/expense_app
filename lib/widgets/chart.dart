@@ -89,7 +89,7 @@ class _ChartState extends State<Chart> {
       elevation: 8,
       margin: EdgeInsets.all(20),
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.35,
+        height: MediaQuery.of(context).orientation == Orientation.portrait ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.height * 0.7,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             // Where the linear gradient begins and ends

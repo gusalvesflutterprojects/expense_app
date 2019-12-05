@@ -31,6 +31,10 @@ class TransactionListContainer extends StatelessWidget {
             left: 12,
           ),
           child: ListTile(
+            contentPadding: EdgeInsets.only(
+              left: 12,
+              right: 24
+            ),
             leading: Text(
               label, // ? XXXXX Spendings
               style: TextStyle(
