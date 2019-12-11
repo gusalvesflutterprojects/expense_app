@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../models/transaction.dart';
 import './chartBar.dart';
 import './limitBar.dart';
@@ -26,6 +27,20 @@ class Chart extends StatefulWidget {
 }
 
 class _ChartState extends State<Chart> {
+  String _formatOrdinalDay(int val) {
+    switch (val) {
+      case 1:
+        return '1st';
+      case 2:
+        return '2nd';
+      case 3:
+        return '3rd';
+        break;
+      default:
+        return '${val}th';
+    }
+  }
+
   List<Map<String, Object>> get groupedTransactionValues {
     return List.generate(
       widget.timeRangeName == 'week' ? 7 : 30,
@@ -69,19 +84,8 @@ class _ChartState extends State<Chart> {
       return Colors.redAccent;
   }
 
-  String _formatOrdinalDay(int val) {
-    switch (val) {
-      case 1:
-        return '1st';
-      case 2:
-        return '2nd';
-      case 3:
-        return '3rd';
-        break;
-      default:
-        return '${val}th';
-    }
-  }
+  bool get isLandscape =>
+      MediaQuery.of(context).orientation == Orientation.landscape;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +93,9 @@ class _ChartState extends State<Chart> {
       elevation: 8,
       margin: EdgeInsets.all(20),
       child: Container(
-        height: MediaQuery.of(context).orientation == Orientation.portrait ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.height * 0.7,
+        height: !isLandscape
+            ? MediaQuery.of(context).size.height * 0.35
+            : MediaQuery.of(context).size.height * 0.6,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             // Where the linear gradient begins and ends

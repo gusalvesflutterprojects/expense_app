@@ -10,13 +10,12 @@ class TransactionListContainer extends StatelessWidget {
   final String label;
   final bool isMain;
 
-  TransactionListContainer({
-    @required this.transactions,
-    @required this.removeTransaction,
-    @required this.reorderTransactions,
-    @required this.label,
-    this.isMain = false
-  });
+  TransactionListContainer(
+      {@required this.transactions,
+      @required this.removeTransaction,
+      @required this.reorderTransactions,
+      @required this.label,
+      this.isMain = false});
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +30,7 @@ class TransactionListContainer extends StatelessWidget {
             left: 12,
           ),
           child: ListTile(
-            contentPadding: EdgeInsets.only(
-              left: 12,
-              right: 24
-            ),
+            contentPadding: EdgeInsets.only(left: 12, right: 24),
             leading: Text(
               label, // ? XXXXX Spendings
               style: TextStyle(

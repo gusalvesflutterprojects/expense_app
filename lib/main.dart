@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:expense_app/widgets/transactionListWrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
@@ -8,7 +12,6 @@ import './widgets/chart.dart';
 import './models/transaction.dart';
 import './widgets/emptyTransactions.dart';
 import './widgets/addTransactionForm.dart';
-import './widgets/transactionListContainer.dart';
 
 void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -64,19 +67,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-    ScrollController _controller = ScrollController();
-
-  void _scrollListener() {
-    if (_controller.offset >= _controller.position.maxScrollExtent &&
-        !_controller.position.outOfRange) {}
-    if (_controller.offset <= _controller.position.minScrollExtent &&
-        !_controller.position.outOfRange) {
-      setState(() {
-        _shouldShowChart = true;
-      });
-    }
-  }
-
   bool _shouldShowChart = true;
   String orderBy = 'mostRecent';
   String _timeRangeName = 'month';
@@ -211,30 +201,34 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Transaction> get _rangeTransactions {
-    if (_timeRangeName == 'week')
-      return _orderedTransactions
-          .where(
-            (tx) =>
-                tx.date.isAfter(
-                  _firstDay.subtract(
-                    Duration(days: 1),
+    switch (_timeRangeName) {
+      case 'month':
+        return _orderedTransactions
+            .where(
+              (tx) =>
+                  tx.date.isAfter(
+                      DateTime(DateTime.now().year, DateTime.now().month, 0)) &&
+                  tx.date.isBefore(DateTime(
+                      DateTime.now().year, DateTime.now().month + 1, 1)),
+            )
+            .toList();
+        break;
+      default: // defaults to 'week'
+        return _orderedTransactions
+            .where(
+              (tx) =>
+                  tx.date.isAfter(
+                    _firstDay.subtract(
+                      Duration(days: 1),
+                    ),
+                  ) &&
+                  tx.date.isBefore(
+                    DateTime.now(),
                   ),
-                ) &&
-                tx.date.isBefore(
-                  DateTime.now(),
-                ),
-          )
-          .toList();
-    else
-      return _orderedTransactions
-          .where(
-            (tx) =>
-                tx.date.isAfter(
-                    DateTime(DateTime.now().year, DateTime.now().month, 0)) &&
-                tx.date.isBefore(
-                    DateTime(DateTime.now().year, DateTime.now().month + 1, 1)),
-          )
-          .toList();
+            )
+            .toList();
+        break;
+    }
   }
 
   List<Transaction> get _otherTransactions {
@@ -357,87 +351,140 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  bool get isLandscape =>
+      MediaQuery.of(context).orientation == Orientation.landscape;
+
+  Widget _buildAppBar() => Platform.isIOS
+      ? CupertinoNavigationBar(
+          middle: Text('Personal Expenses'),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).popUntil(
+                    ModalRoute.withName("/"),
+                  );
+                  _startAddNewTransaction(context);
+                },
+                child: Icon(CupertinoIcons.add),
+              ),
+            ],
+          ),
+        )
+      : AppBar(
+          title: Text(
+            'Expenses App',
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(
+                Icons.add,
+              ),
+              onPressed: () {
+                Navigator.of(context).popUntil(
+                  ModalRoute.withName("/"),
+                );
+                _startAddNewTransaction(context);
+              },
+            ),
+          ],
+        );
+
+  List<Widget> _buildLandscapeContent() => [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Chart',
+              style: TextStyle(fontSize: 18),
+            ),
+            Platform.isIOS
+                ? CupertinoSwitch(
+                    value: _shouldShowChart,
+                    onChanged: (val) => setState(() => _shouldShowChart = val),
+                  )
+                : Switch(
+                    value: _shouldShowChart,
+                    onChanged: (val) => setState(() => _shouldShowChart = val),
+                  ),
+          ],
+        ),
+        _shouldShowChart
+            ? Flexible(
+                fit: FlexFit.tight,
+                child: Chart(
+                  _rangeTransactions,
+                  _firstDay,
+                  _limitValues[_timeRangeName].toDouble(),
+                  _startUpdateLimitValue,
+                  _timeRangeName,
+                  _changeTimeRangeName,
+                ),
+              )
+            : Container(),
+        !_shouldShowChart
+            ? TransactionListWrapper(
+                _rangeTransactions,
+                _otherTransactions,
+                _removeTransaction,
+                _reorderTransactions,
+                _timeRangeName,
+              )
+            : Container(),
+      ];
+
+  List<Widget> _buildPortraitContent() => [
+        Chart(
+          _rangeTransactions,
+          _firstDay,
+          _limitValues[_timeRangeName].toDouble(),
+          _startUpdateLimitValue,
+          _timeRangeName,
+          _changeTimeRangeName,
+        ),
+        TransactionListWrapper(
+          _rangeTransactions,
+          _otherTransactions,
+          _removeTransaction,
+          _reorderTransactions,
+          _timeRangeName,
+        ),
+      ];
+
   @override
   Widget build(BuildContext context) {
-    _controller.addListener(_scrollListener);
-
-    final AppBar appBar = AppBar(
-      title: Text(
-        'Expenses App',
-      ),
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(
-            Icons.add,
-          ),
-          onPressed: () {},
-        ),
-      ],
-    );
-
-    return Scaffold(
-      appBar: appBar,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    final Widget pageBody = SafeArea(
+      child: Column(
         children: <Widget>[
-          // Switch(
-          //   value: _shouldShowChart,
-          //   onChanged: (val) => setState(() => _shouldShowChart = val),),
-          _shouldShowChart
-              ? GestureDetector(
-                  onVerticalDragStart: (_) =>
-                      setState(() => _shouldShowChart = !(_shouldShowChart)),
-                  child: Chart(
-                    _rangeTransactions,
-                    _firstDay,
-                    _limitValues[_timeRangeName].toDouble(),
-                    _startUpdateLimitValue,
-                    _timeRangeName,
-                    _changeTimeRangeName,
-                  ),
-                )
-              : Container(),
-          Expanded(
-            child:
-                _rangeTransactions.length > 0 || _otherTransactions.length > 0
-                    ? ListView(
-                        controller: _controller,
-                        children: <Widget>[
-                          _rangeTransactions.length > 0
-                              ? TransactionListContainer(
-                                  transactions: _rangeTransactions,
-                                  removeTransaction: _removeTransaction,
-                                  reorderTransactions: _reorderTransactions,
-                                  label:
-                                      '${_timeRangeName[0].toUpperCase()}${_timeRangeName.substring(1)} spendings',
-                                  isMain: true,
-                                )
-                              : Container(), // ? Render nothing
-                          _otherTransactions.length > 0
-                              ? TransactionListContainer(
-                                  transactions: _otherTransactions,
-                                  removeTransaction: _removeTransaction,
-                                  reorderTransactions: _reorderTransactions,
-                                  label: 'Other spendings',
-                                )
-                              : Container(), // ? Render nothing,
-                        ],
-                      )
-                    : EmptyTransactions(),
-          ),
+          if (isLandscape) ..._buildLandscapeContent(),
+          if (!isLandscape) ..._buildPortraitContent(),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        elevation: 1,
-        onPressed: () => {
-          Navigator.of(context).popUntil(
-            ModalRoute.withName("/"),
-          ),
-          _startAddNewTransaction(context)
-        },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: pageBody,
+            navigationBar: _buildAppBar(),
+          )
+        : Scaffold(
+            appBar: _buildAppBar(),
+            body: pageBody,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    child: Icon(Icons.add),
+                    elevation: 1,
+                    onPressed: () => {
+                      Navigator.of(context).popUntil(
+                        ModalRoute.withName("/"),
+                      ),
+                      _startAddNewTransaction(context)
+                    },
+                  ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+          );
   }
 }

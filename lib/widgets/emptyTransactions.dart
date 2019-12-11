@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class EmptyTransactions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final MediaQueryData mediaQuery = MediaQuery.of(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -12,8 +13,8 @@ class EmptyTransactions extends StatelessWidget {
         Expanded(
           child: Container(
             margin: EdgeInsets.only(
-              bottom: MediaQuery.of(context).size.height * 0.1,
-              top: MediaQuery.of(context).size.height * 0.05,
+              bottom: mediaQuery.size.height * 0.1,
+              top: mediaQuery.size.height * 0.05,
             ),
             //color: Colors.red,
             child: Image.asset(
